@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NAT-Chat</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <script defer></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .logo {
+        width: 20rem;
+        height: 5rem;
+        object-fit: cover;
+      }
+
+      main {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        margin: 1%;
+      }
+
+      .container {
+        width: 70%;
+        height: 40rem;
+      }
+
+      #messages {
+        width: 100%;
+        height: 80%;
+        border: 0.2rem solid black;
+        overflow-y: scroll;
+        overflow-wrap: break-word;
+      }
+
+      .msg-container {
+        display: flex;
+      }
+
+      #msg-input {
+        width: 20rem;
+        height: 2.2rem;
+        margin-top: 1rem;
+        font-size: x-large;
+        border: 0.2rem solid black;
+        resize: none;
+      }
+
+      #send-btn {
+        border: 0.2rem solid black;
+        width: 5rem;
+        height: 2.8rem;
+        margin: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img class="logo" src="logo.png" alt="NAT-Chat logo" />
+    </header>
+    <main>
+      <div class="container">
+        <div id="messages"></div>
+        <div class="msg-container">
+          <textarea
+            id="msg-input"
+            type="text"
+            placeholder="Type your message..."
+            cols="40"
+            rows="5"
+          ></textarea>
+          <button id="send-btn">Send</button>
+        </div>
+      </div>
+    </main>
+    <script>
+      const messages = document.getElementById("messages");
+      const msgInput = document.getElementById("msg-input");
+      const sendBtn = document.getElementById("send-btn");
+      const socket = new WebSocket(`ws://${location.host}/connect`);
+
+      socket.onmessage = (event) => {
+        const msgElement = document.createElement("div");
+        msgElement.textContent = event.data;
+        messages.appendChild(msgElement);
+        messages.scrollTop = messages.scrollHeight;
+      };
+
+      function sendMsg() {
+        socket.send(msgInput.value);
+        msgInput.value = "";
+      }
+
+      sendBtn.onclick = sendMsg;
+
+      msgInput.onkeypress = (event) => {
+        if (event.keyCode == 13 && !event.shiftKey) {
+          sendMsg();
+          return false;
+        }
+        return true;
+      };
+    </script>
+  </body>
+</html>
