@@ -85,15 +85,20 @@
       const sendBtn = document.getElementById("send-btn");
       const socket = new WebSocket(`ws://${location.host}/connect`);
 
+      let lastMsg = "";
+
       socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
         const msgElement = document.createElement("div");
-        msgElement.textContent = event.data;
+        msgElement.textContent = data[0];
+        msgElement.style.color = data[1];
         messages.appendChild(msgElement);
         messages.scrollTop = messages.scrollHeight;
       };
 
       function sendMsg() {
         socket.send(msgInput.value);
+        lastMsg = msgInput.value;
         msgInput.value = "";
       }
 
@@ -105,6 +110,10 @@
           return false;
         }
         return true;
+      };
+
+      msgInput.onkeydown = (event) => {
+        if (event.keyCode == 38) msgInput.value = lastMsg;
       };
     </script>
   </body>
